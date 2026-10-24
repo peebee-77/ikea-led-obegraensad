@@ -51,7 +51,7 @@
 #ifdef ENABLE_SERVER
 // https://github.com/nayarsystems/posix_tz_db/blob/master/zones.json
 #define NTP_SERVER "de.pool.ntp.org"
-#define TZ_INFO "CET-1CEST,M3.5.0,M10.5.0/3"
+#define MY_TZ "EET-2EEST,M3.5.0/3,M10.5.0/4"
 #endif
 
 #define COLS 16
@@ -65,7 +65,7 @@ constexpr uint8_t MIN_EDGE_BRIGHTNESS = 16;
 constexpr uint16_t TOTAL_PIXELS = ROWS * COLS;
 
 // set your city or coords (https://github.com/chubin/wttr.in)
-#define WEATHER_LOCATION "Hamburg"
+#define WEATHER_LOCATION "Hinthaara"
 
 // name of WiFi created by the device if no known WiFi is available
 #define WIFI_MANAGER_SSID "IKEA"
