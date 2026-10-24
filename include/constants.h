@@ -50,7 +50,7 @@
 
 #ifdef ENABLE_SERVER
 // https://github.com/nayarsystems/posix_tz_db/blob/master/zones.json
-#define NTP_SERVER "de.pool.ntp.org"
+#define NTP_SERVER "fi.pool.ntp.org"
 #define MY_TZ "EET-2EEST,M3.5.0/3,M10.5.0/4"
 #endif
 
