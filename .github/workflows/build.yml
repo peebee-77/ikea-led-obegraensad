@@ -1,22 +1,35 @@
 name: Automaattinen ESP32 Build
 
 on:
-  workflow_dispatch: # Mahdollistaa käynnistyksen napista selaimessa
+  workflow_dispatch: # Käynnistys napista selaimessa
   release:
-    types: [published] # Käynnistyy automaattisesti kun teet julkaisun
+    types: [published]
+
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true # Hiljentää Node-varoitukset
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # Lukitaan vakaaseen versioon, joka toimii varmasti
 
     steps:
       - name: Hae koodi
         uses: actions/checkout@v4
 
-      - name: Asenna Node.js (Web-käyttöliittymää varten)
+      - name: Asenna Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
+      - name: Asenna Python ja vaaditut paketit
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      # Asennetaan PlatformIO sekä esittämäsi projektin Python-riippuvuudet (kuten poetry/requests)
+      - name: Valmistele ympäristö
+        run: |
+          pip install platformio poetry requests requests_toolbelt tqdm
 
       - name: Asenna pnpm ja rakenna Frontend
         run: |
@@ -25,12 +38,6 @@ jobs:
           pnpm install
           pnpm build
           cd ..
-
-      - name: Asenna Python ja PlatformIO
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-      - run: pip install platformio
 
       - name: Korjaa deep+ bugi lennosta
         run: sed -i 's/lib_ldf_mode = deep+/lib_ldf_mode = chain/g' platformio.ini
