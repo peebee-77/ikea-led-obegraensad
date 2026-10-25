@@ -10,17 +10,14 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      # Päivitetty v4 -> v4.2.2 (tukee Node 24:ää virallisesti)
       - name: Hae koodi
         uses: actions/checkout@v4.2.2
 
-      # Päivitetty v4 -> v4.2.0 (Nykyaikainen Node-alustus)
       - name: Asenna Node.js
         uses: actions/setup-node@v4.2.0
         with:
           node-version: 24
 
-      # Päivitetty v5 -> v5.3.0 (Nykyaikainen Python-alustus)
       - name: Asenna Python ja vaaditut paketit
         uses: actions/setup-python@v5.3.0
         with:
@@ -32,16 +29,25 @@ jobs:
 
       - name: Asenna pnpm ja rakenna Frontend
         run: |
+          run: |
           npm install -g pnpm
           cd frontend
           pnpm install
           pnpm build
           cd ..
 
-      - name: Korjaa deep+ bugi lennosta
-        run: sed -i 's/lib_ldf_mode = deep+/lib_ldf_mode = chain/g' platformio.ini
+      - name: Korjaa PlatformIO asetukset ja koodibugit lennosta
+        run: |
+          # Korjataan deep+ kirjastobugi
+          sed -i 's/lib_ldf_mode = deep+/lib_ldf_mode = chain/g' platformio.ini
+          # Korjataan Linux-kääntäjän pnpm-polkubugi koodista
+          sed -i 's/..\\/frontend\\/dist\\/index.html.gz/frontend\/dist\/index.html.gz/g' src/main.cpp || true
+          sed -i 's/..\\/frontend\\/dist/frontend\/dist/g' src/main.cpp || true
 
       - name: Käännä firmware (.bin tiedostoksi)
+        # Syötetään puuttuva TZ_INFO (Suomen aikavyöhyke) kääntäjälle ympäristömuuttujana
+        env:
+          PLATFORMIO_BUILD_FLAGS: '-DTZ_INFO=\"EET-2EEST,M3.5.0\/3,M10.5.0\/4\"'
         run: platformio run -e esp32dev
 
       - name: Tallenna valmis tiedosto ladattavaksi
